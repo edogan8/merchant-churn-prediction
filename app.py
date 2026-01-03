@@ -24,6 +24,18 @@ def user_input_features():
     days_since_last_order = st.sidebar.number_input('Days since last order', min_value = 0, value = 2)
     cashback = st.sidebar.number_input('Cashback amount (Avg)', min_value = 0, value = 150)
 
+    st.sidebar.markdown("---") # Separator
+
+    order_cat = st.sidebar.selectbox(
+        "Preferred Order Category",
+        ("Laptop & Accessory", "Mobile Phone", "Mobile", "Grocery", "Others")
+    )
+
+    marital = st.sidebar.selectbox(
+        "Marital Status",
+        ("Married", "Single", "Divorced")
+    )
+
     # Let's fill in the other features that the model expects with default (average) values.
     # In real life, you'd need to ask about all the features, but for the demo, we got the critical ones.
     # This is a representative data frame.
@@ -32,7 +44,24 @@ def user_input_features():
             'Complain': complain,
             'DaySinceLastOrder': days_since_last_order,
             'CashbackAmount': cashback,
-            # We fill in the other columns (dummy/constant values) so that the model doesn't give an error.
+            
+            # --- MAPPING ---
+            # Change categorical inputs to one-hot encoding
+            
+            # Category Mapping
+            'PreferedOrderCat_Laptop & Accessory': 1 if order_cat == "Laptop & Accessory" else 0,
+            'PreferedOrderCat_Mobile Phone': 1 if order_cat == "Mobile Phone" else 0,
+            'PreferedOrderCat_Mobile': 1 if order_cat == "Mobile" else 0,
+            'PreferedOrderCat_Grocery': 1 if order_cat == "Grocery" else 0,
+            'PreferedOrderCat_Others': 1 if order_cat == "Others" else 0,
+            
+            # Martial Status Mapping
+            'MaritalStatus_Married': 1 if marital == "Married" else 0,
+            'MaritalStatus_Single': 1 if marital == "Single" else 0,
+            
+            # --- DUMMY VALUES ---
+            # Adding other features with average values
+            'CityTier': 2,
             'WarehouseToHome': 15,
             'HourSpendOnApp': 3,
             'NumberOfDeviceRegistered': 4,
@@ -42,11 +71,7 @@ def user_input_features():
             'CouponUsed': 1,
             'OrderCount': 5,
             'Gender_Male': 1,
-            'MaritalStatus_Married': 1,
-            'MaritalStatus_Single': 0,
-            # ... Other encoding columns can be added here
-            # Note: The number of columns must match exactly with the training data!
-            # To avoid errors, add all column names from training data as '0' values.
+            # Other missing columns will be automatically filled in below.
         }
     return pd.DataFrame(data, index=[0])
 
